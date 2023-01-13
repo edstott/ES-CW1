@@ -1,0 +1,186 @@
+# Embedded Systems Lab
+## Coursework 1, Part 1
+### Rasberry Pi, Python and I²C
+
+> **Warning**
+> 
+>  Do not try to power up the Raspberry Pi until you have followed these instructions in order.
+>  It won’t do anything at all until it has been configured properly and you could damage it.
+>  Rasberry Pi's do fail due to mishandling and there are no spares.
+
+### 1. Check kit contents
+
+Your coursework kit should contain the following items:
+- Rasberry Pi Zero WH
+- FTDI TTL-234X-3V3 USB-UART cable
+- Breadboard
+- Raspberry Pi breakout PCB
+- microSD card and USB adapter
+- Sensor kit
+- Wire and wire strippers
+
+### 2. Set up Raspbian OS
+
+1. Download and install Raspberry Pi Imager to your computer from here: https://www.raspberrypi.org/software/
+2. Connect the microSD card to your computer. Use the USB adapter if your computer doesn’t have a microSD socket.
+3. Run Raspberry Pi Imager. It requires admin privileges because it needs to rewrite the file system on the microSD card.
+   1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
+   2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
+   3. Select ‘WRITE’ to download and write the operating system image.
+4. You need to enable the serial console to enter commands on the Raspberry Pi. This is done by editing the options that are passed to the Linux kernel when it boots up. You need to make this edit on the microSD card now because you have no other way to log in to the Raspberry Pi.
+   1. The image you have written contains a partition called ‘boot’, which you should be able to access as a removable drive through the file system of your computer. Remove and reinsert the microSD card if you can’t find it.
+   2. Open the file config.txt with a text editor and add the following to the end in a new line: `enable_uart=1`
+   3.	Save the file.
+5.	Unmount (eject) the microSD card. Remove it from your computer and insert it into the Raspberry Pi.
+
+### 3. Establish communication with your Raspberry Pi
+
+> **Note**
+> 
+> This guide requires you to enter commands in different places
+> 
+> `raspberrypi:~$ command` is a command for the Linux prompt on the Pi
+> 
+> `host:~$ command` is a command for the Linux or macOS prompt on your laptop
+> 
+> `>>> command` is a command for the Python interpreter on the PI
+
+1. Connect your FTDI USB to Serial cable to your laptop and find the port name. Don’t connect the cable to the Raspberry Pi yet
+   1. In Windows:
+      1. Open Device Manager and look under ‘Ports’ for an entry like ‘USB Serial Port (COMn)’
+      2.	The port name is the part COMn
+   2. In MAC or Linux:
+      1.	Open a command prompt and list the available serial devices with `host:~$ ls /dev/{tty,cu}.*`
+      2.	Try the command with and without the cable connected and look for a line which only appears when it is connected. That is the name of your serial port.
+   3. If the system does not recognise the USB device, install the serial port driver from here: https://www.ftdichip.com/Drivers/VCP.htm
+2. Open a terminal over the serial port:
+    1. In Windows, install a terminal client like PuTTY
+        1. Check the box ‘Serial’
+        2. Enter the serial port name under ‘Serial Line’
+       3. Set the speed to 115200
+    2. In MAC or Linux, you can use screen from the command line. For example, if `/dev/ttyS0` is the serial port: `host:~$ screen /dev/ttyS0 115200`
+3. Connect the Raspberry Pi:
+    1. Connect the breakout PCB to the Raspberry Pi ![Connect the breakout PCB to the Raspberry Pi](pi-breakout.png)
+    2. Connect the USB-UART cable to the breakout PCB in the correct orientation
+    3. Connect the power link to power up the Raspberry Pi. This supplies power from the USB-UART cable. ![Connect the USB-UART cable to the breakout PCB](pi-usbuart.png)
+
+> **Warning**
+> 
+> Take care with connections to the Raspberry Pi header.
+> The USB cable provides 5V and the Raspberry Pi I/O pins can only tolerate 3.3V.
+> Always check the positioning and orientation of the breakout board and USB-UART connector before connecting the power link.
+
+> **Note**
+> 
+> You can also supply power to the ‘PWR IN’ connector on the Raspberry Pi with a USB power supply.
+> Leave the power link from the USB-UART cable disconnected if you do this — the serial terminal will still work.
+> 
+> Avoid unplugging the USB-UART cable from your laptop to power down the Raspberry Pi because it will cause the serial port device to disappear and your terminal connection to close
+
+4. Log in to the Raspberry Pi
+    1. Watch your serial terminal to see boot messages from the Raspberry Pi. It may be blank for a little while on the first boot because it resizes the SD Card partition. You should also see the green activity LED blink.
+    2. *Outdated for most recent RPi OS:* Wait for the login prompt to appear. Log in with the username pi and the password raspberry
+
+### 4. Set up the Raspberry Pi
+
+1. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot
+    1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
+    2. *Check in most recent RPi OS:* Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
+    3. Enter the SSID and password of your WiFi network when prompted
+    4. Accept the option to reboot the device
+    5. Check you have a network connection: `raspberrypi:~$ ping google.com`
+2. Connect to WiFi with WPA2-Enterprise networks like Imperial College
+   1. On the Raspberry Pi console, create a hash of your College password so it can’t be easily read from the SD Card. The hash is a 32 digit hexadecimal number:
+
+      `raspberrypi:~$ echo -n plaintext_password_here | iconv -t utf16le | openssl md4`
+      
+   2. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: ```raspberrypi:~$ history -c```
+   3. Edit the wpa_supplicant file to add the network details:
+
+      `raspberrypi:~$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+      
+   4. Add the following lines to the end of the file, replacing `uuu` with your username and `ppp` with password hash you just calculated. Save the file with Ctrl+o and exit with Ctrl+x.
+
+```
+network={
+  ssid="Imperial-WPA"
+  scan_ssid=1
+  key_mgmt=WPA-EAP
+  identity="uuu"
+  password=hash:ppp
+  eap=PEAP
+  phase1="peaplabel=0"
+  phase2="auth=MSCHAPV2"
+}
+```
+
+   5. Restart the Pi: `raspberrypi:~$ sudo reboot`
+   6. Log in and check you have a network connection: `raspberrypi:~$ ping google.com`
+1. Enable the SSH server so you can log in and transfer files via the network
+   2. *Check in most recent RPi OS:* Change the Raspberry Pi password from the default to prevent anyone else from logging in: `raspberrypi:~$ passwd`
+   3. Run the configuration utility and use the menu system to enable SSH under ‘Interfacing Options’: `raspberrypi:~$ sudo raspi-config`
+   4. Find the IP address for your Raspberry Pi. Look in data in the wlan0 section `raspberrypi:~$ ip addr`
+   5.	Log in to your Raspberry Pi from your computer over the network using SSH
+      1. In Windows, use PuTTY, or another SSH client
+      2. In Mac, Linux or Windows with openSSH installed, use the command line (example IP address shown): `host:~$ ssh pi@146.169.152.34`
+   6. Copy a file (just a text file to test) from your computer to the Raspberry Pi 
+      1. In Windows, use WinSCP, MobaXterm or a similar client
+      2. In Mac, Linux or Windows with openSSH installed, use the command line: `host:~$ scp test.txt pi@146.169.152.34:~/test.txt`
+
+>**Note**
+>
+>You should be able to connect to the Raspberry Pi from any computer on the same network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
+>
+>The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
+>You could also use a DDNS service to resolve a dynamic IP from a static URL. However, take care with online guides on DDNS because it is usually used to allow devices to receive external connections from the internet, not internal connections from the local network.
+
+### 5. Establish communication with a sensor
+
+Choose an I2C sensor from the selection available. It doesn’t need to be one you will use in your coursework.
+
+- What does it do?
+- What is the power supply voltage? If it uses a breakout module then check documentation for the module
+- Research the communication interface for the sensor
+  - What is its I2C bus address?
+  - Does it need enabling or configuring before sensing is active?
+  - Does it measure automatically or in response to a command?
+  - How do you request a measurement (if applicable)?
+  - How do you read back the result?
+  - What conversion is needed to convert the result into something meaningful?
+
+1. Power down the Raspberry Pi:
+   1. Shut down the operating system. This reduces the chance of file corruption and it should be done before any power down: `raspberrypi:~$ sudo halt`
+   2. Remove the power link
+2. Plug the Raspberry Pi breakout adapter and sensor module into different locations on the breadboard
+3. Wire up the sensor module
+   1.	Check the documentation for the sensor module (the breakout, not the chip itself) to find the power requirements.
+   2.	Use 3.3V if possible to reduce the chance of damage
+   3. Wire up the positive and GND power supply connections between the sensor and the breakout adapter
+   4. Wire up the I2C data and clock lines (SDA and SCL). I2C pullup resistors are not required because they are included on the Raspberry Pi.
+4. Power the Raspberry Pi again and log in via serial or SSH
+5. Install the I2C tools package: `raspberrypi:~$ sudo apt-get install i2c-tools`
+6. Enable I2C (Interface Options) `raspberrypi:~$ sudo raspi-config` and reboot `raspberrypi:~$ sudo reboot`
+7. Search the I2C bus for your sensor module: `raspberrypi:~$ sudo i2cdetect -y 1`
+
+>**Note**
+>
+>The `i2cdetect` command shows a map of all the I2C addresses.
+>
+>You should see an entry at the address you expect from reading the sensor documentation.
+>Technically speaking, the I2C address is a 7-bit number but some datasheets append the read/write flag as the LSB to give two 8-bit addresses: one for reading and one for writing.
+>
+>Note that some devices have an address that is configurable by making connections to certain pins.
+
+### 6. Set up a Python development flow
+
+1. *Connect to the Rasberry Pi via Visual Studio Code*
+2. Install `pip`, the python package manager, and the `smbus2` and `gpiozero` modules
+
+```
+raspberrypi:~$ sudo apt-get install python3-pip
+raspberrypi:~$ sudo pip3 install smbus2 gpiozero
+```
+
+4. Use functions of the `smbus2` library to communicate with your sensor
+*Add examples from lecture notes*
+
