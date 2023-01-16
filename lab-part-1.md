@@ -21,20 +21,6 @@ Your coursework kit should contain the following items:
 
 ### 2. Set up Raspbian OS
 
-1. Download and install Raspberry Pi Imager to your computer from here: https://www.raspberrypi.org/software/
-2. Connect the microSD card to your computer. Use the USB adapter if your computer doesn’t have a microSD socket.
-3. Run Raspberry Pi Imager. It requires admin privileges because it needs to rewrite the file system on the microSD card.
-   1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
-   2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
-   3. Select ‘WRITE’ to download and write the operating system image.
-4. You need to enable the serial console to enter commands on the Raspberry Pi. This is done by editing the options that are passed to the Linux kernel when it boots up. You need to make this edit on the microSD card now because you have no other way to log in to the Raspberry Pi.
-   1. The image you have written contains a partition called ‘boot’, which you should be able to access as a removable drive through the file system of your computer. Remove and reinsert the microSD card if you can’t find it.
-   2. Open the file config.txt with a text editor and add the following to the end in a new line: `enable_uart=1`
-   3.	Save the file.
-5.	Unmount (eject) the microSD card. Remove it from your computer and insert it into the Raspberry Pi.
-
-### 3. Establish communication with your Raspberry Pi
-
 > **Note**
 > 
 > This guide requires you to enter commands in different places
@@ -44,6 +30,31 @@ Your coursework kit should contain the following items:
 > `host:~$ command` is a command for the Linux or macOS prompt on your laptop
 > 
 > `>>> command` is a command for the Python interpreter on the PI
+
+1. Download and install Raspberry Pi Imager to your computer from here: https://www.raspberrypi.org/software/
+2. Connect the microSD card to your computer. Use the USB adapter if your computer doesn’t have a microSD socket.
+3. Run Raspberry Pi Imager. It requires admin privileges because it needs to rewrite the file system on the microSD card.
+   1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
+   2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
+   3. Open the advnaced options menu with the cog icon. Make the following changes:
+      1. Check 'Set hostname'. Change the hostname to something that is likely to be unique.
+      2. Check 'Enable SSH'
+      3. Check 'Set username and password'
+      4. Enter a password. Leave the username as `pi`
+      5. (Optional) Configure a wireless network, which is only possible for WPA2-PSK networks at this stage. See later instructions for WPA2-Enterprise (e.g. Imperial College)
+![Rasberry Pi OS image options](rpi-image-options.png)
+   4. Select ‘WRITE’ to download and write the operating system image.
+4. You need to enable the serial console to enter commands on the Raspberry Pi. This is done by editing the options that are passed to the Linux kernel when it boots up. You need to make this edit on the microSD card now because you have no other way to log in to the Raspberry Pi.
+   1. The image you have written contains a partition called ‘boot’, which you should be able to access as a removable drive through the file system of your computer. Remove and reinsert the microSD card if you can’t find it.
+   2. Open the file config.txt with a text editor and add the following to the end in a new line: `enable_uart=1`
+   3.	Save the file.
+5.	Unmount (eject) the microSD card. Remove it from your computer and insert it into the Raspberry Pi.
+
+### 3. Establish communication with your Raspberry Pi (Serial)
+
+> **Note**
+>
+> You *may* be able to skip this step if you configured a wireless network in the image options.
 
 1. Connect your FTDI USB to Serial cable to your laptop and find the port name. Don’t connect the cable to the Raspberry Pi yet
    1. In Windows:
@@ -55,10 +66,14 @@ Your coursework kit should contain the following items:
    3. If the system does not recognise the USB device, install the serial port driver from here: https://www.ftdichip.com/Drivers/VCP.htm
 2. Open a terminal over the serial port:
     1. In Windows, install a terminal client like PuTTY
-        1. Check the box ‘Serial’
-        2. Enter the serial port name under ‘Serial Line’
+       1. Check the box ‘Serial’
+       2. Enter the serial port name under ‘Serial Line’
        3. Set the speed to 115200
-    2. In MAC or Linux, you can use screen from the command line. For example, if `/dev/ttyS0` is the serial port: `host:~$ screen /dev/ttyS0 115200`
+       4. Click 'Open'
+    2. In MAC or Linux, you can use screen from the command line. For example, if `/dev/ttyS0` is the serial port:
+
+```host:~$ screen /dev/ttyS0 115200```
+
 3. Connect the Raspberry Pi:
     1. Connect the breakout PCB to the Raspberry Pi ![Connect the breakout PCB to the Raspberry Pi](pi-breakout.png)
     2. Connect the USB-UART cable to the breakout PCB in the correct orientation
@@ -74,8 +89,6 @@ Your coursework kit should contain the following items:
 > 
 > You can also supply power to the ‘PWR IN’ connector on the Raspberry Pi with a USB power supply.
 > Leave the power link from the USB-UART cable disconnected if you do this — the serial terminal will still work.
-> 
-> Avoid unplugging the USB-UART cable from your laptop to power down the Raspberry Pi because it will cause the serial port device to disappear and your terminal connection to close
 
 4. Log in to the Raspberry Pi
     1. Watch your serial terminal to see boot messages from the Raspberry Pi. It may be blank for a little while on the first boot because it resizes the SD Card partition. You should also see the green activity LED blink.
