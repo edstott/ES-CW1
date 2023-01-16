@@ -41,7 +41,7 @@ Your coursework kit should contain the following items:
       2. Check 'Enable SSH'
       3. Check 'Set username and password'
       4. Enter a password. Leave the username as `pi`
-      5. (Optional) Configure a wireless network, which is only possible for WPA2-PSK networks at this stage. See later instructions for WPA2-Enterprise (e.g. Imperial College)
+      5. (Optional) Configure a wireless network, which is only possible for WPA2-PSK networks (e.g. home WiFi, mobile hotspot) at this stage. See later instructions for WPA2-Enterprise (e.g. Imperial College)
 ![Rasberry Pi OS image options](rpi-image-options.png)
    4. Select ‘WRITE’ to download and write the operating system image.
 4. You need to enable the serial console to enter commands on the Raspberry Pi. This is done by editing the options that are passed to the Linux kernel when it boots up. You need to make this edit on the microSD card now because you have no other way to log in to the Raspberry Pi.
@@ -49,12 +49,27 @@ Your coursework kit should contain the following items:
    2. Open the file config.txt with a text editor and add the following to the end in a new line: `enable_uart=1`
    3.	Save the file.
 5.	Unmount (eject) the microSD card. Remove it from your computer and insert it into the Raspberry Pi.
+6.	Connect the Raspberry Pi:
+    1. Connect the breakout PCB to the Raspberry Pi ![Connect the breakout PCB to the Raspberry Pi](pi-breakout.png)
+    2. Connect the USB-UART cable to the breakout PCB in the correct orientation
+    3. Connect the power link to power up the Raspberry Pi. This supplies power from the USB-UART cable. ![Connect the USB-UART cable to the breakout PCB](pi-usbuart.png)
+
+> **Warning**
+> 
+> Take care with connections to the Raspberry Pi header.
+> The USB cable provides 5V and the Raspberry Pi I/O pins can only tolerate 3.3V.
+> Always check the positioning and orientation of the breakout board and USB-UART connector before connecting the power link.
+
+> **Note**
+> 
+> You can also supply power to the ‘PWR IN’ connector on the Raspberry Pi with a USB power supply.
+> Leave the power link from the USB-UART cable disconnected if you do this — the serial terminal will still work.
 
 ### 3. Establish communication with your Raspberry Pi (Serial)
 
 > **Note**
 >
-> You *may* be able to skip this step if you configured a wireless network in the image options.
+> You may be able to skip this step if you configured a wireless network in the image options.
 
 1. Connect your FTDI USB to Serial cable to your laptop and find the port name. Don’t connect the cable to the Raspberry Pi yet
    1. In Windows:
@@ -74,41 +89,20 @@ Your coursework kit should contain the following items:
 
 ```host:~$ screen /dev/ttyS0 115200```
 
-3. Connect the Raspberry Pi:
-    1. Connect the breakout PCB to the Raspberry Pi ![Connect the breakout PCB to the Raspberry Pi](pi-breakout.png)
-    2. Connect the USB-UART cable to the breakout PCB in the correct orientation
-    3. Connect the power link to power up the Raspberry Pi. This supplies power from the USB-UART cable. ![Connect the USB-UART cable to the breakout PCB](pi-usbuart.png)
-
-> **Warning**
-> 
-> Take care with connections to the Raspberry Pi header.
-> The USB cable provides 5V and the Raspberry Pi I/O pins can only tolerate 3.3V.
-> Always check the positioning and orientation of the breakout board and USB-UART connector before connecting the power link.
-
-> **Note**
-> 
-> You can also supply power to the ‘PWR IN’ connector on the Raspberry Pi with a USB power supply.
-> Leave the power link from the USB-UART cable disconnected if you do this — the serial terminal will still work.
-
 4. Log in to the Raspberry Pi
-    1. Watch your serial terminal to see boot messages from the Raspberry Pi. It may be blank for a little while on the first boot because it resizes the SD Card partition. You should also see the green activity LED blink.
-    2. *Outdated for most recent RPi OS:* Wait for the login prompt to appear. Log in with the username pi and the password raspberry
+    1. If the Raspberry Pi has finished booting the serial terminal will be blank. Press enter to refresh the login prompt. The first boot will take a while because the SD Card file system is resized to fill the card. The green activity LED will flicker during boot.
+    3. Log in with the username `pi` and the password you specified in Raspberry Pi Imager.
 
-### 4. Set up the Raspberry Pi
+### 3. Establish communication with your Raspberry Pi (WiFi)
 
-1. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot
-    1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
-    2. *Check in most recent RPi OS:* Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
-    3. Enter the SSID and password of your WiFi network when prompted
-    4. Accept the option to reboot the device
-    5. Check you have a network connection: `raspberrypi:~$ ping google.com`
-2. Connect to WiFi with WPA2-Enterprise networks like Imperial College
-   1. On the Raspberry Pi console, create a hash of your College password so it can’t be easily read from the SD Card. The hash is a 32 digit hexadecimal number:
+1. To connect to a WPA2-Enterprise network like Imperial College:
+   1. Open the serial port terminal
+   2. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number.
 
-      `raspberrypi:~$ echo -n plaintext_password_here | iconv -t utf16le | openssl md4`
+      `raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4`
       
-   2. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: ```raspberrypi:~$ history -c```
-   3. Edit the wpa_supplicant file to add the network details:
+   3. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: ```raspberrypi:~$ history -c```
+   4. Edit the wpa_supplicant file to add the network details:
 
       `raspberrypi:~$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
       
@@ -126,26 +120,25 @@ network={
   phase2="auth=MSCHAPV2"
 }
 ```
-
    5. Restart the Pi: `raspberrypi:~$ sudo reboot`
-   6. Log in and check you have a network connection: `raspberrypi:~$ ping google.com`
-1. Enable the SSH server so you can log in and transfer files via the network
-   2. *Check in most recent RPi OS:* Change the Raspberry Pi password from the default to prevent anyone else from logging in: `raspberrypi:~$ passwd`
-   3. Run the configuration utility and use the menu system to enable SSH under ‘Interfacing Options’: `raspberrypi:~$ sudo raspi-config`
-   4. Find the IP address for your Raspberry Pi. Look in data in the wlan0 section `raspberrypi:~$ ip addr`
-   5.	Log in to your Raspberry Pi from your computer over the network using SSH
-      1. In Windows, use PuTTY, or another SSH client
-      2. In Mac, Linux or Windows with openSSH installed, use the command line (example IP address shown): `host:~$ ssh pi@146.169.152.34`
-   6. Copy a file (just a text file to test) from your computer to the Raspberry Pi 
-      1. In Windows, use WinSCP, MobaXterm or a similar client
-      2. In Mac, Linux or Windows with openSSH installed, use the command line: `host:~$ scp test.txt pi@146.169.152.34:~/test.txt`
+
+2. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot
+    1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
+    2. Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
+    3. Enter the SSID and password of your WiFi network when prompted
+
+3. Open a SSH connection
+   1. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
+   1. (Windows) Install PuTTY or other SSH client (e.g. MobaXterm) if necessary. Open a new SSH session with your Pi's hostname.
+   2. (Mac, Linux or Windows with openSSH installed) Use the command line (example hostname shown): `host:~$ ssh pi@raspberrypi.local`
+   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname.
+   5. Check you have a network connection: `raspberrypi:~$ ping google.com`
 
 >**Note**
 >
->You should be able to connect to the Raspberry Pi from any computer on the same network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
+>You should be able to connect to the Raspberry Pi from any computer on the same local network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
 >
 >The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
->You could also use a DDNS service to resolve a dynamic IP from a static URL. However, take care with online guides on DDNS because it is usually used to allow devices to receive external connections from the internet, not internal connections from the local network.
 
 ### 5. Establish communication with a sensor
 
