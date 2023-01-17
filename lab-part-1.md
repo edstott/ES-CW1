@@ -179,14 +179,33 @@ Choose an I2C sensor from the selection available. It doesn’t need to be one y
 
 ### 6. Set up a Python development flow
 
-1. *Connect to the Rasberry Pi via Visual Studio Code*
-2. Install `pip`, the python package manager, and the `smbus2` and `gpiozero` modules
+> *Note*
+> 
+> Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you. 
+
+1. Install Visual Studio Code on your laptop if you don't have it. Add the extensions for [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [SSH FS](https://marketplace.visualstudio.com/items?itemName=Kelvin.vscode-sshfs)
+2. Open a SSH terminal to the Raspberry Pi
+   1. Type or select 'SSH FS: Open remote SSH terminal' in the Visual Studio Code Command Palette (F1)
+   4. Type the `pi@raspberrypi.local:22/home/pi`, changing the Raspberry Pi hostname as appropriate
+![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-workspace.png)
+
+4. Using the Raspberry Pi terminal, install `pip`, the python package manager, and the `smbus2` and `gpiozero` Python modules
 
 ```
 raspberrypi:~$ sudo apt-get install python3-pip
 raspberrypi:~$ sudo pip3 install smbus2 gpiozero
 ```
 
-4. Use functions of the `smbus2` library to communicate with your sensor
+2. Add the Raspberry Pi file system to your Workspace in Visual Studio Code
+   1. Open the Command Palette and type/select 'SSH FS: Add as a Workspace folder'
+   2. Type/select the same SSH URI as you used to open the terminal
+   3. Enter the password if requested. Look out for additional password prompts at the top of the screen.
+   4. Check that you can access the home directory on the Raspberry Pi in the Explorer sidebar
+![Visual Studio Code with access to Raspberry Pi files](sshfs-workspace.png)
+3. Create a Python script file
+   1. Select File→New File...
+   2. Enter the filename `main.py`
+   3. Accept the complete path `/home/pi/main.py`
+5. Use functions of the `smbus2` library to communicate with your sensor
 *Add examples from lecture notes*
 
