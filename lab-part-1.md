@@ -69,7 +69,7 @@ Your coursework kit should contain the following items:
 
 > **Note**
 >
-> You may be able to skip this step if you configured a wireless network in the image options.
+> You may be able to skip to [step 5](https://github.com/edstott/ES-CW1/edit/main/lab-part-1.md#4-set-up-a-python-development-flow) if you configured a wireless network in the image options and it works right away.
 
 1. Connect your FTDI USB to Serial cable to your laptop and find the port name. Don’t connect the cable to the Raspberry Pi yet
    1. In Windows:
@@ -93,108 +93,70 @@ Your coursework kit should contain the following items:
     1. If the Raspberry Pi has finished booting the serial terminal will be blank. Press enter to refresh the login prompt. The first boot will take a while because the SD Card file system is resized to fill the card. The green activity LED will flicker during boot.
     3. Log in with the username `pi` and the password you specified in Raspberry Pi Imager.
 
-### 3. Establish communication with your Raspberry Pi (WiFi)
+### 4. Establish communication with your Raspberry Pi (WiFi)
 
-1. To connect to a WPA2-Enterprise network like Imperial College:
-   1. Open the serial port terminal
+1. Open the serial port terminal and log in to the Raspberry Pi
+1. Connect to a WPA2-Enterprise network like Imperial College:
    2. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number.
 
-      `raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4`
+      ```bash
+      raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4
+      ```
       
-   3. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: ```raspberrypi:~$ history -c```
-   4. Edit the wpa_supplicant file to add the network details:
+   3. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: 
 
-      `raspberrypi:~$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+      ```bash
+      raspberrypi:~$ history -c
+      ```
+
+   5. Edit the wpa_supplicant file to add the network details:
+
+      ```bash
+      raspberrypi:~$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+      ```
       
-   4. Add the following lines to the end of the file, replacing `uuu` with your username and `ppp` with password hash you just calculated. Save the file with Ctrl+o and exit with Ctrl+x.
+   6. Add the following lines to the end of the file, replacing `uuu` with your username and `ppp` with password hash you just calculated. Save the file with Ctrl+o and exit with Ctrl+x.
 
-```
-network={
-  ssid="Imperial-WPA"
-  scan_ssid=1
-  key_mgmt=WPA-EAP
-  identity="uuu"
-  password=hash:ppp
-  eap=PEAP
-  phase1="peaplabel=0"
-  phase2="auth=MSCHAPV2"
-}
-```
-   5. Restart the Pi: `raspberrypi:~$ sudo reboot`
+        ```
+        network={
+           ssid="Imperial-WPA"
+           scan_ssid=1
+           key_mgmt=WPA-EAP
+           identity="uuu"
+           password=hash:ppp
+           eap=PEAP
+           phase1="peaplabel=0"
+           phase2="auth=MSCHAPV2"
+        }
+        ```
 
-2. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot
+   6. Restart the Pi: `raspberrypi:~$ sudo reboot`
+
+
+2. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot:
     1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
     2. Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
     3. Enter the SSID and password of your WiFi network when prompted
 
-3. Open a SSH connection
-   1. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
-   1. (Windows) Install PuTTY or other SSH client (e.g. MobaXterm) if necessary. Open a new SSH session with your Pi's hostname.
-   2. (Mac, Linux or Windows with openSSH installed) Use the command line (example hostname shown): `host:~$ ssh pi@raspberrypi.local`
-   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname.
-   5. Check you have a network connection: `raspberrypi:~$ ping google.com`
-
->**Note**
->
->You should be able to connect to the Raspberry Pi from any computer on the same local network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
->
->The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
-
-### 5. Establish communication with a sensor
-
-Choose an I2C sensor from the selection available. It doesn’t need to be one you will use in your coursework.
-
-- What does it do?
-- What is the power supply voltage? If it uses a breakout module then check documentation for the module
-- Research the communication interface for the sensor
-  - What is its I2C bus address?
-  - Does it need enabling or configuring before sensing is active?
-  - Does it measure automatically or in response to a command?
-  - How do you request a measurement (if applicable)?
-  - How do you read back the result?
-  - What conversion is needed to convert the result into something meaningful?
-
-1. Power down the Raspberry Pi:
-   1. Shut down the operating system. This reduces the chance of file corruption and it should be done before any power down: `raspberrypi:~$ sudo halt`
-   2. Remove the power link
-2. Plug the Raspberry Pi breakout adapter and sensor module into different locations on the breadboard
-3. Wire up the sensor module
-   1.	Check the documentation for the sensor module (the breakout, not the chip itself) to find the power requirements.
-   2.	Use 3.3V if possible to reduce the chance of damage
-   3. Wire up the positive and GND power supply connections between the sensor and the breakout adapter
-   4. Wire up the I2C data and clock lines (SDA and SCL). I2C pullup resistors are not required because they are included on the Raspberry Pi.
-4. Power the Raspberry Pi again and log in via serial or SSH
-5. Install the I2C tools package: `raspberrypi:~$ sudo apt-get install i2c-tools`
-6. Enable I2C (Interface Options) `raspberrypi:~$ sudo raspi-config` and reboot `raspberrypi:~$ sudo reboot`
-7. Search the I2C bus for your sensor module: `raspberrypi:~$ sudo i2cdetect -y 1`
-
->**Note**
->
->The `i2cdetect` command shows a map of all the I2C addresses.
->
->You should see an entry at the address you expect from reading the sensor documentation.
->Technically speaking, the I2C address is a 7-bit number but some datasheets append the read/write flag as the LSB to give two 8-bit addresses: one for reading and one for writing.
->
->Note that some devices have an address that is configurable by making connections to certain pins.
-
-### 6. Set up a Python development flow
+### 4. Set up a Python development flow
 
 > *Note*
 > 
-> Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you. 
+> Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). That means, among other things, that the debugger is not available. An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you. 
 
 1. Install Visual Studio Code on your laptop if you don't have it. Add the extensions for [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [SSH FS](https://marketplace.visualstudio.com/items?itemName=Kelvin.vscode-sshfs)
 2. Open a SSH terminal to the Raspberry Pi
    1. Type or select 'SSH FS: Open remote SSH terminal' in the Visual Studio Code Command Palette (F1)
-   4. Type the `pi@raspberrypi.local:22/home/pi`, changing the Raspberry Pi hostname as appropriate
-![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-workspace.png)
+   2. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
+   4. Type `pi@raspberrypi.local:22/home/pi` into the , changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
+![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-terminal.png)
+   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname.
 
-4. Using the Raspberry Pi terminal, install `pip`, the python package manager, and the `smbus2` and `gpiozero` Python modules
-
-```
-raspberrypi:~$ sudo apt-get install python3-pip
-raspberrypi:~$ sudo pip3 install smbus2 gpiozero
-```
+   >**Note**
+   >
+   >You should be able to connect to the Raspberry Pi from any computer on the same local network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
+   >
+   >The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
 
 2. Add the Raspberry Pi file system to your Workspace in Visual Studio Code
    1. Open the Command Palette and type/select 'SSH FS: Add as a Workspace folder'
@@ -202,10 +164,108 @@ raspberrypi:~$ sudo pip3 install smbus2 gpiozero
    3. Enter the password if requested. Look out for additional password prompts at the top of the screen.
    4. Check that you can access the home directory on the Raspberry Pi in the Explorer sidebar
 ![Visual Studio Code with access to Raspberry Pi files](sshfs-workspace.png)
+
 3. Create a Python script file
    1. Select File→New File...
    2. Enter the filename `main.py`
    3. Accept the complete path `/home/pi/main.py`
-5. Use functions of the `smbus2` library to communicate with your sensor
-*Add examples from lecture notes*
+   4. Enter and save a test script:
+
+        ```python
+        print("Hello")
+        ```
+        
+   5. Run the script on the Raspberry Pi using the SSH terminal:
+
+      ```bash
+      raspberrypi:~$ python3 main.py
+      ```
+
+### 5. Establish communication with a sensor
+
+The lab kit contains a Si7021 temperature/humidity sensor to get started with I²C.
+
+1. Power down the Raspberry Pi:
+   1. Shut down the operating system. This reduces the chance of file corruption and it should be done before any power down: `raspberrypi:~$ sudo halt`
+   2. Remove the power link
+2. Plug the Raspberry Pi breakout adapter and sensor module into different locations on the breadboard
+3. Wire up the sensor module
+   | RPi | Si7021 |
+   | --- | ------ |
+   | GND | GND    |
+   | 3.3V | VIN |
+   | SDA | SDA |
+   | SCL | SCL |
+   
+   I2C pullup resistors are not required because they are included on the Raspberry Pi.
+4. Power the Raspberry Pi again and log in via SSH
+5. Install the I2C tools package:
+
+   ```bash
+   raspberrypi:~$ sudo apt-get update
+   raspberrypi:~$ sudo apt-get install i2c-tools
+   ```
+
+7. Enable I2C (Interface Options) `raspberrypi:~$ sudo raspi-config` and reboot `raspberrypi:~$ sudo reboot`
+8. Search the I2C bus for your sensor module: `raspberrypi:~$ sudo i2cdetect -y 1`
+
+   ![Result of i2cdetect with Si7021 connected](i2cdetect.png)
+
+   >**Note**
+   >
+   >The `i2cdetect` command shows a map of all the I2C addresses.
+   >
+   >You should see an entry at the address you expect from reading the sensor documentation.
+   >Technically speaking, the I2C address is a 7-bit number but some datasheets append the read/write flag as the LSB to give two 8-bit addresses: one for reading and one for writing.
+   >
+   >Note that some devices have an address that is configurable by making connections to certain pins.
+
+4. Install `pip`, the python package manager, and the `smbus2` and `gpiozero` Python modules
+
+   ```bash
+   raspberrypi:~$ sudo apt-get install python3-pip
+   raspberrypi:~$ sudo pip3 install smbus2 gpiozero
+   ```
+
+5. Use functions of the `smbus2` library to communicate with your sensor in main.py:
+   
+   ```python
+   import time
+   import smbus2
+   
+   si7021_ADD = 0x40
+   si7021_READ_TEMPERATURE = 0xf3
+   
+   bus = smbus2.SMBus(1)
+   
+   #Set up a write transaction that sends the command to measure temperature
+   cmd_meas_temp = smbus2.i2c_msg.write(si7021_ADD,[si7021_READ_TEMPERATURE])
+   
+   #Set up a read transaction that reads two bytes of data
+   read_result = smbus2.i2c_msg.read(si7021_ADD,2)
+   
+   #Execute the two transactions with a small delay between them
+   bus.i2c_rdwr(cmd_meas_temp)
+   time.sleep(0.1)
+   bus.i2c_rdwr(read_result)
+
+   #convert the result to an int
+   temperature = int.from_bytes(read_result.buf[0]+read_result.buf[1],'big')
+   print(temperature)
+   ```
+
+   Run the script and, if all is well, you will see the temperature measurement.
+   The measurement is the raw 16-bit word from the sensor and it is not yet scaled to real-world units.
+   Refer to the datasheet to see the formula for conversion to degrees Celcius.
+   Nevertheless, you will see the number increase if you warm the sensor slightly and repeat the measurement.
+   
+   >**Note**
+   >
+   >The use of the `time.sleep()` function may seem a little unsatisfactory.
+   >The sensor, like many, requires some time to perform the measurment after receiving the measurement command.
+   >It is possible for the sensor to pause the I²C read transaction until the measurement has finished but it uses an I²C feature called clock stretching, which is not supported by the Raspberry Pi (it actually implements a derivation of I²C called SMBus).
+   >The workaround for this sensor is to wait long enough to guarantee that the measurement has finished before attempting the read transaction.
+   
+
+
 
