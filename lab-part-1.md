@@ -138,7 +138,7 @@ Your coursework kit should contain the following items:
     2. Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
     3. Enter the SSID and password of your WiFi network when prompted
 
-### 4. Set up a Python development flow
+### 5. Set up a Python development flow
 
 > *Note*
 > 
@@ -181,19 +181,21 @@ Your coursework kit should contain the following items:
       raspberrypi:~$ python3 main.py
       ```
 
-### 5. Establish communication with a sensor
+### 6. Establish communication with a sensor
 
-The lab kit contains a Si7021 temperature/humidity sensor to get started with I²C.
+The lab kit contains a Si7021 temperature/humidity sensor module to get started with I²C.
 
 1. Power down the Raspberry Pi:
    1. Shut down the operating system. This reduces the chance of file corruption and it should be done before any power down: `raspberrypi:~$ sudo halt`
    2. Remove the power link
 2. Plug the Raspberry Pi breakout adapter and sensor module into different locations on the breadboard
-3. Wire up the sensor module
+3. Consult the [product webpage for the sensor module](https://www.adafruit.com/product/3251) to find the appropriate supply voltage.
+   Always use 3.3V in preference to 5V where available to reduce the chance of accidentally breaking the Raspberry Pi.
+   Add wires between the module and the Raspberry Pi breakout:
    | RPi | Si7021 |
    | --- | ------ |
    | GND | GND    |
-   | 3.3V | VIN |
+   | 3.3V or 5V (check) | VIN |
    | SDA | SDA |
    | SCL | SCL |
    
@@ -227,14 +229,19 @@ The lab kit contains a Si7021 temperature/humidity sensor to get started with I�
    raspberrypi:~$ sudo pip3 install smbus2 gpiozero
    ```
 
-5. Use functions of the `smbus2` library to communicate with your sensor in main.py:
+5. Consult the [Si7021 datasheet](https://www.silabs.com/documents/public/data-sheets/Si7021-A20.pdf) to find the following information:
+   - The I²C bus address (page 18)
+   - The command byte to read temperature in 'no hold master mode' (page 18)
+   - The conversion formula between the sensor output and degrees Celsius (page 22)
+
+7. Use functions of the `smbus2` library to communicate with your sensor in main.py:
    
    ```python
    import time
    import smbus2
    
-   si7021_ADD = 0x40
-   si7021_READ_TEMPERATURE = 0xf3
+   si7021_ADD = #Add the I2C bus address for the sensor here
+   si7021_READ_TEMPERATURE = #Add the command to read temperature here
    
    bus = smbus2.SMBus(1)
    
@@ -254,10 +261,10 @@ The lab kit contains a Si7021 temperature/humidity sensor to get started with I�
    print(temperature)
    ```
 
-   Run the script and, if all is well, you will see the temperature measurement.
+   Add the constants for the I²C bus address and read temperature command. Run the script and, if all is well, you will see the temperature measurement.
    The measurement is the raw 16-bit word from the sensor and it is not yet scaled to real-world units.
-   Refer to the datasheet to see the formula for conversion to degrees Celcius.
    Nevertheless, you will see the number increase if you warm the sensor slightly and repeat the measurement.
+   Add a statement to apply the conversion formula from the datasheet so that the script gives the measurement in degrees Celsius.
    
    >**Note**
    >
