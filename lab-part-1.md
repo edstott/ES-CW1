@@ -37,7 +37,7 @@ Your coursework kit should contain the following items:
    1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
    2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
    3. Open the advnaced options menu with the cog icon. Make the following changes:
-      1. Check 'Set hostname'. Change the hostname to something that is likely to be unique.
+      1. Check 'Set hostname'. Change the hostname to something that is likely to be unique, for example by appending your College username.
       2. Check 'Enable SSH'
       3. Check 'Set username and password'
       4. Enter a password. Leave the username as `pi`
