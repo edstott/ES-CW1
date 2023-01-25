@@ -16,7 +16,7 @@ Your coursework kit should contain the following items:
 - Breadboard
 - Raspberry Pi breakout PCB
 - microSD card and USB adapter
-- Sensor kit
+- Si7021 temperature sensor
 - Wire and wire strippers
 
 ### 2. Set up Raspbian OS
@@ -269,8 +269,8 @@ The lab kit contains a Si7021 temperature/humidity sensor module to get started 
    >**Note**
    >
    >The use of the `time.sleep()` function may seem a little unsatisfactory.
-   >The sensor, like many, requires some time to perform the measurment after receiving the measurement command.
-   >It is possible for the sensor to pause the I²C read transaction until the measurement has finished but it uses an I²C feature called clock stretching, which is not supported by the Raspberry Pi (it actually implements a derivation of I²C called SMBus).
+   >The Si7021 sensor, like many, requires some time to perform the measurment after receiving the measurement command.
+   >It is possible for the sensor to pause the I²C read transaction until the measurement has finished ('hold master mode' in the datasheet), but it uses an I²C feature called clock stretching, which is not supported by the Raspberry Pi (it actually implements a derivation of I²C called SMBus).
    >The workaround for this sensor is to wait long enough to guarantee that the measurement has finished before attempting the read transaction.
    
 
