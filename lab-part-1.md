@@ -96,8 +96,8 @@ Your coursework kit should contain the following items:
 ### 4. Establish communication with your Raspberry Pi (WiFi)
 
 1. Open the serial port terminal and log in to the Raspberry Pi
-1. Connect to a WPA2-Enterprise network like Imperial College:
-   2. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number.
+2. Connect to a WPA2-Enterprise network like Imperial College:
+   1. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number.
 
       ```bash
       raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4
