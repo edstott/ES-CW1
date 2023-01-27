@@ -96,7 +96,7 @@ Your coursework kit should contain the following items:
 ### 4. Establish communication with your Raspberry Pi (WiFi)
 
 1. Open the serial port terminal and log in to the Raspberry Pi
-2. Connect to a WPA2-Enterprise network like Imperial College:
+2. To connect to a WPA2-Enterprise network like Imperial College:
    1. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number. You can also use web tools to calculate an MD4 hash, if you trust them with your password. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
 
       ```bash
@@ -133,14 +133,24 @@ Your coursework kit should contain the following items:
    6. Restart the Pi: `raspberrypi:~$ sudo reboot`
 
 
-2. Connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot:
+2. To connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot:
     1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
     2. Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
     3. Enter the SSID and password of your WiFi network when prompted
 
+3. Test the connection:
+
+    ```
+    raspberrypi:~$ ping google.com
+    ```
+
+> **Note**
+> 
+> You can add mutliple networks to `wpa_supplicant.conf` and the Rapsberry Pi will connect to whichever is strongest. Networks added using `raspi-config` will also appear in the configuration file.
+
 ### 5. Set up a Python development flow
 
-> *Note*
+> **Note**
 > 
 > Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). That means, among other things, that the debugger is not available. An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you. 
 
@@ -150,7 +160,7 @@ Your coursework kit should contain the following items:
    2. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
    4. Type `pi@raspberrypi.local:22/home/pi` into the , changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
 ![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-terminal.png)
-   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname.
+   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname. mDNS doesn't seem to work on the College WiFi.
 
    >**Note**
    >
