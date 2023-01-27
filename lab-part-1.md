@@ -97,7 +97,7 @@ Your coursework kit should contain the following items:
 
 1. Open the serial port terminal and log in to the Raspberry Pi
 2. Connect to a WPA2-Enterprise network like Imperial College:
-   1. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number.
+   1. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number. You can also use web tools to calculate an MD4 hash, if you trust them with your password. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
 
       ```bash
       raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4
