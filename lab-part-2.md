@@ -109,7 +109,7 @@
        > You can also run the processing loop continuously in the background using `Client.loop_start()` and `Client.loop_stop()`.
        > This will run your callback as soon as the message arrives.
 
-### 2. Databse with HTTP API
+### 2. Database with REST (HTTP) API
 
 > **Note**
 > These instructions use Google Firebase to host a database. You can host a database with other providers and the process will be similar.
@@ -147,7 +147,7 @@
           if response.ok:
               print("Ok")
           else:
-              raise ConnectionError("Could not write to database")
+              raise ConnectionError("Could not write to database: {}".format(response.text))
           time.sleep(1)
           n += 1
       ```
@@ -157,9 +157,9 @@
       If the script ran correctly, you'll see the database tree extended with 'timeseries', and below that nodes for each request you submitted.
       Each node contains two key:value pairs: an index 'n' and a random number 'rnd'.
    3. The PUT method created new nodes with a name derived from the system time with `int(time.time())`.
-      Each PUT request needs to create a node with a unique name, and the timestamp isn't perfect for that — for example, the system time might be wrong.
+      Each PUT request needs to create a node with a unique name, and that might not always be easy.
       
-      The POST method can fix this because it creates a node with an automatically-generated unique name.
+      The POST method can help because it creates a node with an automatically-generated unique name.
       POST is often used to create lists of data because a new node will be added to a location regardless of what is there already.
       
       Try it with this modified script:
@@ -173,15 +173,152 @@
           data = {"n":n, "time":time.time(), "rnd":random.random()}
     
           print("Writing {} to {}".format(data, path))
-          response = requests.put(db+path, json=data)
+          response = requests.post(db+path, json=data)
     
           if response.ok:
-              print("New node at {}".format(response.json().name))
+              print("Created new node named {}".format(response.json()["name"]))
           else:
-              raise ConnectionError("Could not write to database")
+              raise ConnectionError("Could not write to database: {}".format(response.text))
           time.sleep(1)
           n += 1
       ```
-       
+      
+      The response for POST request contains the generated name for the node under the `name` key, which is printed if the request is successful.
+      
+4. Read from the database
+   1. Reading a specific node from the database is a simple case of using a GET request with the path to the relevant node:
+      
+      ```python
+      import requests, time
+      db = "https://esexample-ccdba-default-rtdb.europe-west1.firebasedatabase.app/"
+      path = "level1.json" #This node was created in the Firebase console in step 1
+      
+      response = requests.get(db+path)
+      if response.ok:
+          print(response.json())
+      else:
+          raise ConnectionError("Could not access database: {}".format(response.text))
+      ```
+      
+      If the node has child nodes, they will be returned as a hierarchy of JSON objects within the top-level object.
+      Change `path` in the example code to simply `.json`, which will return the entire database.
+      
+      The Response.json() method returns the JSON object as a Python data structure.
+      Retrieve the node accessed previously at `level1` by indexing the object with `level1` as a key: `print(response.json()["level1"])`
+      
+   2. You may not know the name of the node or nodes you wish to access.
+      You could download the entire database and search for the information you need, but that would be inefficient.
+      Instead, you can add queries to the database request to select the data you need.
+      1. First, add a database rule to define that the contents of the 'timeseries' node will be indexed by key, which was a timestamp.
+         Switch to the 'Rules' tab in the console webpage for Firebase Realtime Database and change the database rules to the following:
+      
+         ```json
+         {
+            "rules": {
+               ".read": true,
+               ".write": true,
+               "timeseries": {
+                  ".indexOn": ".key"
+               }  
+            }
+         }
+         ```
+         
+      2. Add a line to your read script that defines a query. The query contains three parameters, which begin with `?` and are separated by `&`:
+         - `orderBy="$key"` means that the query will be matched against node names (`"` is escaped with `\"` in the Python code)
+         - `startAt="{}"` is populated with the current system time minus one hour. That will be the earliest node returned
+         - `endAt="{}"` is populated with the current time so that every time until now is matched
 
+         ```python
+         query = "?orderBy=\"$key\"&startAt=\"{}\"&endAt=\"{}\"".format(int(time.time()-3600), int(time.time()))
+         ```
+         
+         Change the database path to point to the 'timeseries' node and modify the HTTP request to append the query:
+         
+         ```python
+         path = "timeseries.json"
+         
+         response = requests.get(db+path+query)
+         ```
+         
+         Run the script. You will get an object containing nodes with the matching keys.
+         You may need to adjust the `startAt=` parameter depending on when you created the database nodes.
+         Pick a value that returns only some of the nodes in 'timeseries'
+         
+      3. You can search within nodes to run your database queries.
+         Modify the `.indexOn` parameter to include the child key 'rnd':
+         
+         ```json
+         "timeseries": {
+            ".indexOn": [".key","rnd"]
+         }
+         ```
+         
+         Modify the query to return nodes according to their child node 'rnd', returning nodes where 'rnd' is greater or equal to 0.5:
+         
+         ```python
+         query = "?orderBy=\"rnd\"&startAt=0.5&endAt=1.0"
+         ```
+         
+         Try the new query. Querying by child nodes is useful when writing to the database with POST, since you can look past the auto-generated, unique key for the nodes to meaningful data contain within.
+         Your query can look multiple levels down the hierarchy — not just at the direct child nodes of the set you are querying.
+         See the [Google documentation](https://firebase.google.com/docs/database/rest/retrieve-data#section-rest-filtering) for more information on database queries.
+        
 
+3. Your database is currently readable and writable to anyone. The identity of the server is proved by its HTTPS certificate, but you also need to authenticate the client to restrict access to your data.
+   1. Switch off public access to your database by changing the `read` and `write` database rules to `false`. Your previous scripts will no longer work.
+   2. Get a key that will allow admin access to the database. In the Firebase console, go to Project Settings and switch to the tab for Service Accounts. Click 'Generate Private Key'. Copy the resulting .json file to the Raspberry Pi.
+      ![Utility to create an admin key](firebase-genkey.png)
+   3. Install the [Google authentication module](https://google-auth.readthedocs.io/en/latest/user-guide.html#making-authenticated-requests) for Python
+      
+      ```bash
+      raspberrypi:~$ pip3 install google-auth
+      ```
+      
+   3. Add authentication to the previous test script for POST access.
+      Google provides a wrapper for Requests, [`AuthorizedSession`](https://google-auth.readthedocs.io/en/latest/user-guide.html#requests), which adds the necessary authentication to HTTP requests using the private key you downloaded.
+      
+      ```python
+      import time,random
+      from google.oauth2 import service_account
+      from google.auth.transport.requests import AuthorizedSession
+      
+      # Define the database URL (change to use your database)
+      db = "https://esexample-ccdba-default-rtdb.europe-west1.firebasedatabase.app/"
+      
+      # Define the private key file (change to use your private key)
+      keyfile = "src\esexample-ccdba-firebase-adminsdk-awsaw-482267641d.json"
+
+      # Define the required scopes
+      scopes = [
+          "https://www.googleapis.com/auth/userinfo.email",
+          "https://www.googleapis.com/auth/firebase.database"
+      ]
+
+      # Authenticate a credential with the service account (change to use your private key)
+      credentials = service_account.Credentials.from_service_account_file(keyfile, scopes=scopes)
+
+      # Use the credentials object to authenticate a Requests session.
+      authed_session = AuthorizedSession(credentials)
+      
+      n = 0
+      while n < 10:
+          path = "postlist.json"
+          data = {"n":n, "time":time.time(), "rnd":random.random()}
+
+          print("Writing {} to {}".format(data, path))
+          response = authed_session.post(db+path, json=data)
+
+          if response.ok:
+              print("Created new node named {}".format(response.json()["name"]))
+          else:
+              raise ConnectionError("Could not write to database: {}".format(response.text))
+          time.sleep(1)
+          n += 1
+      ```
+      
+      > *Note*
+      > 
+      > It wouldn't be appropriate to embed admin access to the database into a real IoT device.
+      > Instead, the device should probably use some user credentials assoicated with the user of the device.
+      > If you would like to explore this further, Firebase provides [user authentication](https://firebase.google.com/docs/database/rest/auth#python) through the Firebase SDK. It will add some complexity to your system because you'll need to think about how a user will sign in on their embedded device.
