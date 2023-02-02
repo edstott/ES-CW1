@@ -46,7 +46,7 @@ Your coursework kit should contain the following items:
    4. Select ‘WRITE’ to download and write the operating system image.
 4. You need to enable the serial console to enter commands on the Raspberry Pi. This is done by editing the options that are passed to the Linux kernel when it boots up. You need to make this edit on the microSD card now because you have no other way to log in to the Raspberry Pi.
    1. The image you have written contains a partition called ‘boot’, which you should be able to access as a removable drive through the file system of your computer. Remove and reinsert the microSD card if you can’t find it.
-   2. Open the file config.txt with a text editor and add the following to the end in a new line: `enable_uart=1`
+   2. Open the file config.txt with a text editor and add the following to the end (after `[all]`) in a new line: `enable_uart=1`
    3.	Save the file.
 5.	Unmount (eject) the microSD card. Remove it from your computer and insert it into the Raspberry Pi.
 6.	Connect the Raspberry Pi:
