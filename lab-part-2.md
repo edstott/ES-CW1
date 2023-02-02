@@ -120,7 +120,7 @@
    3. Open 'Realtime Database', which is under 'Build' in the sidebar. Click 'Create Database'.
    4. Start in test mode. You can add security rules later.
    5. The database will open with a view of the data, which is currently `null`. Add some test data in the form of a key:value pair `test: true` (Boolean)
-      ![firebase.testdata.png]
+      ![Manual entry of data into Firebase](firebase-testdata.png)
    6. Add another entry in a child node `level1/test: true`.
       
       > **Note**
@@ -131,11 +131,15 @@
 2. Write to the database from embedded Python
    1. The database can be accessed using HTTP requests.
       Writing data will most commonly use PUT or POST methods.
-      First, use PUT to create a series of data nodes indexed by their timestamp:
+      First, use PUT to create a series of data nodes indexed by their timestamp.
+      You'll need to replace the database URL in all the following examples with the URL for your own database, which is shown at the top of the web console where you viewed and editted the database.
       
       ```python
       import requests,time,random
+      
+      # Define the database URL (change to use your database)
       db = "https://esexample-ccdba-default-rtdb.europe-west1.firebasedatabase.app/"
+      
       n = 0
       while n < 10:
           path = "timeseries/{}.json".format(int(time.time()))
@@ -283,7 +287,6 @@
       from google.oauth2 import service_account
       from google.auth.transport.requests import AuthorizedSession
       
-      # Define the database URL (change to use your database)
       db = "https://esexample-ccdba-default-rtdb.europe-west1.firebasedatabase.app/"
       
       # Define the private key file (change to use your private key)
