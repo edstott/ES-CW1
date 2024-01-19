@@ -36,7 +36,7 @@ Your coursework kit should contain the following items:
 3. Run Raspberry Pi Imager. It requires admin privileges because it needs to rewrite the file system on the microSD card.
    1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
    2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
-   3. Open the advnaced options menu with the cog icon. Make the following changes:
+   3. Open the advanced options menu with the cog icon. Make the following changes:
       1. Check 'Set hostname'. Change the hostname to something that is likely to be unique, for example by appending your College username.
       2. Check 'Enable SSH'
       3. Check 'Set username and password'
@@ -92,6 +92,10 @@ Your coursework kit should contain the following items:
 4. Log in to the Raspberry Pi
     1. If the Raspberry Pi has finished booting the serial terminal will be blank. Press enter to refresh the login prompt. The first boot will take a while because the SD Card file system is resized to fill the card. The green activity LED will flicker during boot.
     3. Log in with the username `pi` and the password you specified in Raspberry Pi Imager.
+
+> **Note**
+> 
+> The terminal client on your laptop connects to a chip inside the UART cable, which converts USB to UART. You don't need to reopen or reconnect the terminal if you reboot or power cycle the Raspberry Pi, as long as you leave the cable plugged in to your computer
 
 ### 4. Establish communication with your Raspberry Pi (WiFi)
 
