@@ -153,24 +153,22 @@ Your coursework kit should contain the following items:
 > You can add mutliple networks to `wpa_supplicant.conf` and the Rapsberry Pi will connect to whichever is strongest. Networks added using `raspi-config` will also appear in the configuration file.
 
 ### 5. Set up a Python development flow
+Follow the instructions according to the model of Raspberry Pi in your kit. Other tools for remote Python development are available and there is no requirement to follow the instructions here.
 
-> **Note**
-> 
-> Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). That means, among other things, that the debugger is not available. An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you. 
+#### a. Original Raspberry Pi Zero
 
-1. Install Visual Studio Code on your laptop if you don't have it. Add the extensions for [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [SSH FS](https://marketplace.visualstudio.com/items?itemName=Kelvin.vscode-sshfs)
+Visual Studio Code [does not support Raspberry Pi Zero with its remote development extension](https://github.com/microsoft/vscode-remote-release/issues/669#issuecomment-640986010). That means, among other things, that the debugger is not available. An alternative development flow is described here using a third-party extension, but other tools for remote Python development are available and you may wish to experiment to find a method that works well for you.
+
+1. Install Microsoft Visual Studio Code on your laptop if you don't have it. Add the extensions for [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) and [SSH FS](https://marketplace.visualstudio.com/items?itemName=Kelvin.vscode-sshfs)
 2. Open a SSH terminal to the Raspberry Pi
    1. Type or select 'SSH FS: Open remote SSH terminal' in the Visual Studio Code Command Palette (F1)
    2. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
-   4. Type `pi@raspberrypi.local:22/home/pi` into the , changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
+   4. Type `pi@raspberrypi.local:22/home/pi`, changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
 ![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-terminal.png)
    3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname. mDNS doesn't seem to work on the College WiFi.
 
-   >**Note**
-   >
-   >You should be able to connect to the Raspberry Pi from any computer on the same local network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
-   >
-   >The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
+
+
 
 2. Add the Raspberry Pi file system to your Workspace in Visual Studio Code
    1. Open the Command Palette and type/select 'SSH FS: Add as a Workspace folder'
@@ -194,6 +192,34 @@ Your coursework kit should contain the following items:
       ```bash
       raspberrypi:~$ python3 main.py
       ```
+
+#### b. Raspberry Pi Zero 2 or Raspberry Pi 3
+
+1. Install Microsoft Visual Studio Code. Open a window and ensure sure that [Remote Development](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) is installed and enabled.
+2. Open a Remote Window
+   1. Click the remote development button in the bottom left-hand corner: ![Logo for VS Code Remote Development](https://ms-vscode-remote.gallerycdn.vsassets.io/extensions/ms-vscode-remote/vscode-remote-extensionpack/0.25.0/1701252518317/Microsoft.VisualStudio.Services.Icons.Default)
+   2.  A menu appears below the Search Bar/Command Palette at the top of the window. `Select Connect to Host...`, then 'Add New SSH Host'. 
+   2. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`. Type `pi@raspberrypi.local:22/home/pi`, changing the Raspberry Pi hostname as appropriate.
+   3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname. mDNS doesn't seem to work on the College WiFi.
+   4. Follow the instructions in the command bar. You will need to enter your password and specify the operating system of the remote device (Linux). Visual Studio Code will install some runtime components onto the Raspberry Pi.
+3. Create a Python script file
+   1. Select File→New File...
+   2. Enter the filename `main.py`
+   3. Accept the complete path `/home/pi/main.py`
+   4. Enter and save a test script:
+
+        ```python
+        print("Hello")
+        ```
+        
+   5. Run the script on the Raspberry Pi by using 'Debug Current File' in the 'Run and Debug' sidebar. You will see the result in the output window at the bottom of the window.
+
+   >**Note**
+   >
+   >You should be able to connect to the Raspberry Pi from any computer on the same local network, depending on the structure of the network. In general, you won’t be able to reach it via the internet.
+   >
+   >The IP address is likely to change if you restart or reconnect the Raspberry Pi. You may be able to use a static IP if you have control over your DHCP server, but you can’t on the College network.
+
 
 ### 6. Establish communication with a sensor
 
