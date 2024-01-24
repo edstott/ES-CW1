@@ -11,13 +11,17 @@
 ### 1. Check kit contents
 
 Your coursework kit should contain the following items:
-- Rasberry Pi Zero WH
+- Rasberry Pi Zero WH or Rasberry Pi Zero 2
 - FTDI TTL-234X-3V3 USB-UART cable
 - Breadboard
 - Raspberry Pi breakout PCB
 - microSD card and USB adapter
 - Si7021 temperature sensor
 - Wire and wire strippers
+
+![Raspberry Pi Zero W](pi-zero.png)
+
+![Raspberry Pi Zero 2](pi-zero2.png)
 
 ### 2. Set up Raspbian OS
 
@@ -34,7 +38,7 @@ Your coursework kit should contain the following items:
 1. Download and install Raspberry Pi Imager to your computer from here: https://www.raspberrypi.org/software/
 2. Connect the microSD card to your computer. Use the USB adapter if your computer doesn’t have a microSD socket.
 3. Run Raspberry Pi Imager. It requires admin privileges because it needs to rewrite the file system on the microSD card.
-   1. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
+   1. Select the version of Raspberry Pi according to the device you have: Zero or Zero 2 W. Select the operating system Raspberry Pi OS Lite (32-bit). It’s under Raspberry Pi OS (other) in the list of options.
    2. Select the SD Card. Be careful – you could erase your data if you choose the wrong card.
    3. Open the advanced options menu with the cog icon. Make the following changes:
       1. Check 'Set hostname'. Change the hostname to something that is likely to be unique, for example by appending your College username.
@@ -59,6 +63,10 @@ Your coursework kit should contain the following items:
 > Take care with connections to the Raspberry Pi header.
 > The USB cable provides 5V and the Raspberry Pi I/O pins can only tolerate 3.3V.
 > Always check the positioning and orientation of the breakout board and USB-UART connector before connecting the power link.
+
+> **Warning**
+> 
+> Take care with the positioning of your Raspberry Pi, especially if you have a metal laptop case. If you short out any exposed metal connection on the Raspberry Pi it could cause permananet damage.
 
 > **Note**
 > 
