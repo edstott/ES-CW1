@@ -19,9 +19,13 @@ Your coursework kit should contain the following items:
 - Si7021 temperature sensor
 - Wire and wire strippers
 
-![Raspberry Pi Zero W](pi-zero.png)
+![Raspberry Pi Zero W](pi-zero.jpg)
 
-![Raspberry Pi Zero 2](pi-zero2.png)
+*Raspberry Pi Zero*
+
+![Raspberry Pi Zero 2](pi-zero2.jpg)
+
+*Raspberry Pi Zero 2*
 
 ### 2. Set up Raspbian OS
 
