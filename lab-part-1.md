@@ -150,11 +150,12 @@ Your coursework kit should contain the following items:
 
 
 2. To connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot:
+    1. Make sure the network is using the 2.4GHz band with WPA2 security
     1. Run the Raspberry Pi configuration tool: `raspberrypi:~$ sudo raspi-config`
     2. Use the arrow keys and enter to select ‘System Options’, then ‘Wireless LAN’
     3. Enter the SSID and password of your WiFi network when prompted
 
-3. Test the connection:
+4. Test the connection:
 
     ```
     raspberrypi:~$ ping google.com
