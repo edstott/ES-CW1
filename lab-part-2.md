@@ -8,7 +8,7 @@
    3. Convert it to a JSON message with function dumps() from python module json
 2. Send and receive MQTT messages using the Mosquitto test broker and the HiveMQ web client:
    1. Load the [web client](https://www.hivemq.com/blog/full-featured-mqtt-client-browser/)
-   2. Connect to the broker at `test.mosquitto.org` using port 8080
+   2. Connect to the broker at `test.mosquitto.org` using port 8081. Enable SSL
    3. Subscribe to the topic `IC.embedded/GROUP_NAME/#`
    4. Publish a test message to the topic IC.embedded/GROUP_NAME and check it shows in the Messages feed
 3. Connect to the broker from your Raspberry Pi
