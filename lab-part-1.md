@@ -113,41 +113,57 @@ Your coursework kit should contain the following items:
 
 1. Open the serial port terminal and log in to the Raspberry Pi
 2. To connect to a WPA2-Enterprise network like Imperial College:
-   1. Create a hash of your College password so it can’t be easily read from the SD Card. Replace `ppp` with your password in the command below. The hash is a 32 digit hexadecimal number. You can also use web tools to calculate an MD4 hash, if you trust them with your password. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
+   1. Run NetworkManager Text UI
 
       ```bash
-      raspberrypi:~$ echo -n ppp | iconv -t utf16le | openssl md4
+      raspberrypi:~$ sudo nmtui
+      ```
+
+   2. Choose 'Edit a connection', then '<Add>', then 'Wi-Fi'
+   3. Complete or edit the following fields of the form:
+  
+      | Field | Value |
+      | ----- | ----- |
+      | Profile name | Imperial-WPA |
+      | SSID | Imperial-WPA |
+      | Security | WPA & WPA2 Enterprise |
+      | Authentication | \<PEAP\> |
+      | Anonymous Identity | your_ICT_login† |
+      | Username | your_ICT_login† |
+      | Password | your_ICT_password† |
+      
+      _†replace with your own credentials_
+      
+     ![Completed connection details in nmtui](nmtui.png)
+
+   5. Select 'Ok', then 'Back', then 'Activate a connection'
+   6. Select 'Imperial-WPA' then 'Activate'. The interface will attempt the connection and show an error if it fails.
+   7. _Doesn't work, needs further investigation!_ NetworkManager stores your credentials in plain text in `/etc/NetworkManager/system-coinnections/Imperial-WPA.nmconnection`. You replace this password with a hash that will stop someone from reading your password from the SDCard and logging in to your account. Create the hash with the following command. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
+
+      ```bash
+      echo -n your_ICT_password | iconv -t utf16le | openssl dgst -md4 -provider legacy
       ```
       
-   3. Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: 
+      Clear the command history to remove your password from it. Make sure you close the serial console when you are finished so it can’t be read by scrolling back: 
 
       ```bash
       raspberrypi:~$ history -c
       ```
 
-   5. Edit the wpa_supplicant file to add the network details:
+      Edit the config file as shown below, replacing `hhh` with the output of the password hash:
 
       ```bash
-      raspberrypi:~$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+      raspberrypi:~$ sudo nano /etc/NetworkManager/system-coinnections/Imperial-WPA.nmconnection
       ```
-      
-   6. Add the following lines to the end of the file, replacing `uuu` with your username and `ppp` with password hash you just calculated. Save the file with Ctrl+o and exit with Ctrl+x.
 
-        ```
-        network={
-           ssid="Imperial-WPA"
-           scan_ssid=1
-           key_mgmt=WPA-EAP
-           identity="uuu"
-           password=hash:ppp
-           eap=PEAP
-           phase1="peaplabel=0"
-           phase2="auth=MSCHAPV2"
-        }
-        ```
+      ```
+      ...
+      [802-1x]
+      ...
+      password=hash:hhh
+      ...
 
-   6. Restart the Pi: `raspberrypi:~$ sudo reboot`
-
+      ```
 
 2. To connect to WiFi with WPA2-PSK networks like home WiFi or mobile hotspot:
     1. Make sure the network is using the 2.4GHz band with WPA2 security
@@ -160,10 +176,6 @@ Your coursework kit should contain the following items:
     ```
     raspberrypi:~$ ping google.com
     ```
-
-> **Note**
-> 
-> You can add mutliple networks to `wpa_supplicant.conf` and the Rapsberry Pi will connect to whichever is strongest. Networks added using `raspi-config` will also appear in the configuration file.
 
 ### 5. Set up a Python development flow
 Follow the instructions according to the model of Raspberry Pi in your kit. Other tools for remote Python development are available and there is no requirement to follow the instructions here.
