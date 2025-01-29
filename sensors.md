@@ -11,7 +11,7 @@
 | AS7262 | Spectral light sensor | I2C |
 | BMP280 | Atmospheric pressure sensor | I2C |
 | Si7021 | Air temperature and humidity sensor | I2C |
-| CCS811 | Air quality sensor | I2C |
+| CCS811 | Air quality sensor | I2C (use [software I2C](https://github.com/fivdi/i2c-bus/blob/master/doc/raspberry-pi-software-i2c.md)) |
 | D6F-V03A1 | Air velocity sensor | Analogue (buffered output 0-5V) |
 | P182A | Flex sensor | Analogue (resistive) |
 | ADS1115 | ADC for analogue sensors | I2C |
