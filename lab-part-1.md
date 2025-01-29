@@ -188,7 +188,7 @@ Visual Studio Code [does not support Raspberry Pi Zero with its remote developme
 2. Open a SSH terminal to the Raspberry Pi
    1. Type or select 'SSH FS: Open remote SSH terminal' in the Visual Studio Code Command Palette (F1)
    2. You should be able to connect to the Raspberry Pi using mDNS. Recall the hostname that you specified in Raspberry Pi Imager, including the `.local` suffix that was hardcoded in the interface. The default was `raspberrypi.local`.
-   4. Type `pi@raspberrypi.local:22/home/pi`, changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
+   4. Type `pi@raspberrypi.local:22`, changing the Raspberry Pi hostname as appropriate. The terminal will open at the bottom of the window.
 ![Visual Studio Code with SSH terminal to Raspberry Pi](sshfs-terminal.png)
    3. If the mDNS connection fails, use the serial terminal to find your Pi's IP address with `raspberrypi:~$ hostname -I`. Use this to open your SSH connection instead of the hostname. mDNS doesn't seem to work on the College WiFi.
 
