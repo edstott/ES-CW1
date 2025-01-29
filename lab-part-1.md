@@ -287,13 +287,6 @@ The lab kit contains a Si7021 temperature/humidity sensor module to get started 
    >
    >Note that some devices have an address that is configurable by making connections to certain pins.
 
-4. Install `pip`, the python package manager, and the `smbus2` and `gpiozero` Python modules
-
-   ```bash
-   raspberrypi:~$ sudo apt-get install python3-pip
-   raspberrypi:~$ sudo pip3 install smbus2 gpiozero
-   ```
-
 5. Consult the [Si7021 datasheet](https://www.silabs.com/documents/public/data-sheets/Si7021-A20.pdf) to find the following information:
    - The I²C bus address (page 18)
    - The command byte to read temperature in 'no hold master mode' (page 18)
