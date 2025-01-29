@@ -15,7 +15,7 @@
    1. Install the paho module for python
 
       ```bash
-      raspberrypi:~$ pip3 install paho-mqtt
+      raspberrypi:~$ sudo apt install python3-paho-mqtt
       ```
 
    2. Connect to the test broker in python using unencrypted port 1883 and publish a message
