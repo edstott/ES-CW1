@@ -136,9 +136,9 @@ Your coursework kit should contain the following items:
       
      ![Completed connection details in nmtui](nmtui.png)
 
-   5. Select 'Ok', then 'Back', then 'Activate a connection'
-   6. Select 'Imperial-WPA' then 'Activate'. The interface will attempt the connection and show an error if it fails.
-   7. _Doesn't work, needs further investigation!_ NetworkManager stores your credentials in plain text in `/etc/NetworkManager/system-coinnections/Imperial-WPA.nmconnection`. You replace this password with a hash that will stop someone from reading your password from the SDCard and logging in to your account. Create the hash with the following command. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
+   5. Select 'Ok', then 'Back', then Radio
+   6. Enable both the Hardware and Software settings for WiFi
+   9. _Doesn't work, needs further investigation!_ NetworkManager stores your credentials in plain text in `/etc/NetworkManager/system-coinnections/Imperial-WPA.nmconnection`. You can replace this password with a hash that will stop someone from reading your password from the SDCard and logging in to your account. Create the hash with the following command. You may need to [preceed certain non-alphanumeric characters in your password with a forward slash](https://www.oreilly.com/library/view/learning-the-bash/1565923472/ch01s09.html).
 
       ```bash
       echo -n your_ICT_password | iconv -t utf16le | openssl dgst -md4 -provider legacy
